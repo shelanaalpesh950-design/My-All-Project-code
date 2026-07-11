@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>અલ્પેશ માર્ટ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- એમેઝોન સ્ટાઇલ હેડર -->
+    <header class="amazon-header">
+        <div class="nav-logo">
+            <h2>🛒 AlpeshZon</h2>
+        </div>
+        <div class="nav-search">
+            <input type="text" placeholder="શોધો તમારી વસ્તુઓ..." class="search-input" disabled>
+            <button class="search-btn">🔍</button>
+        </div>
+    </header>
+
+    <!-- પ્રોડક્ટ ડિસ્પ્લે સેક્શન (માત્ર એક-એક ફોટો અને રિવ્યુ) -->
+    <main class="product-container">
+        
+        <!-- વસ્તુ ૧ -->
+        <div class="product-card">
+            <div class="product-img-box">
+                <!-- જો તમારી પાસે ફોટો ન હોય તો અત્યારે આ ઓટોમેટીક ફોટો દેખાશે, તમે આ નામ બદલીને પોતાનો ફોટો મૂકી શકો છો -->
+                <img src="product1.jpg" onerror="this.src='https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500'" alt="વસ્તુ ૧" class="product-img">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">પહેલી વસ્તુનું નામ અહીં લખો</h3>
+                
+                <div class="product-rating">
+                    <span class="stars">⭐⭐⭐⭐⭐</span>
+                    <span class="review-count">(૫૦ રિવ્યુ)</span>
+                </div>
+                
+                <p class="product-price"><span class="rupee">₹</span>૫૦૦</p>
+                <button class="buy-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- વસ્તુ ૨ -->
+        <div class="product-card">
+            <div class="product-img-box">
+                <img src="product2.jpg" onerror="this.src='https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500'" alt="વસ્તુ ૨" class="product-img">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">બીજી વસ્તુનું નામ અહીં લખો</h3>
+                
+                <div class="product-rating">
+                    <span class="stars">⭐⭐⭐⭐☆</span>
+                    <span class="review-count">(૩૨ રિવ્યુ)</span>
+                </div>
+                
+                <p class="product-price"><span class="rupee">₹</span>૧,૨૦૦</p>
+                <button class="buy-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- વસ્તુ ૩ -->
+        <div class="product-card">
+            <div class="product-img-box">
+                <img src="product3.jpg" onerror="this.src='https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500'" alt="વસ્તુ ૩" class="product-img">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">ત્રીજી વસ્તુનું નામ અહીં લખો</h3>
+                
+                <div class="product-rating">
+                    <span class="stars">⭐⭐⭐⭐⭐</span>
+                    <span class="review-count">(૧૫ રિવ્યુ)</span>
+                </div>
+                
+                <p class="product-price"><span class="rupee">₹</span>૮૦૦</p>
+                <button class="buy-btn">Add to Cart</button>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

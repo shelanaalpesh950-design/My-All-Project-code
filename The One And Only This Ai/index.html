@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diploma Study Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <div class="app-shell">
+        <!-- ============ SIDEBAR ============ -->
+        <aside id="sidebar">
+            <div class="brand">
+                <div class="brand-logo">🎓</div>
+                <div class="brand-text">
+                    <strong>AI Study Assistant</strong>
+                    <span>Diploma CS · GTU</span>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <button class="nav-item active" onclick="switchTab('dashboard-section', this)">🏠 <span>Dashboard</span></button>
+                <button class="nav-item" onclick="switchTab('doubt-section', this)">💬 <span>AI Doubt & Code</span></button>
+                <button class="nav-item" onclick="switchTab('library-section', this)">📚 <span>Auto Library</span></button>
+                <button class="nav-item" onclick="switchTab('syllabus-section', this)">✅ <span>Syllabus Tracker</span></button>
+                <button class="nav-item" onclick="switchTab('flashcard-section', this)">🗂️ <span>Flashcards</span></button>
+                <button class="nav-item" onclick="switchTab('projects-section', this)">📂 <span>My Projects</span></button>
+                <button class="nav-item" onclick="switchTab('dsa-section', this)">💡 <span>DSA Corner</span></button>
+                <button class="nav-item" onclick="switchTab('result-section', this)">📊 <span>Growth Tracker</span></button>
+            </nav>
+
+            <div class="side-footer">
+                <button id="theme-toggle" onclick="toggleTheme()">🌓 <span>Dark Mode</span></button>
+            </div>
+        </aside>
+
+        <!-- ============ MAIN ============ -->
+        <div class="main-wrap">
+            <header class="topbar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="topbar-right">
+                    <label class="sem-label">સેમેસ્ટર:</label>
+                    <select id="semester-select" onchange="onSemesterChange()">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3" selected>Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                    </select>
+                </div>
+            </header>
+
+            <main>
+                <!-- ===== DASHBOARD ===== -->
+                <section id="dashboard-section" class="tab-content">
+                    <div class="welcome-card">
+                        <h2>👋 Welcome back, Student!</h2>
+                        <p id="welcome-sub">આજે શું ભણવું છે? તમારો પ્રોગ્રેસ નીચે જુઓ.</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="ring" id="ring-progress"><span id="ring-progress-val">0%</span></div>
+                            <p>Syllabus Progress</p>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="stat-avg">0</span>
+                            <p>Average Marks</p>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="stat-cards">0</span>
+                            <p>Flashcards</p>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="stat-projects">0</span>
+                            <p>Projects</p>
+                        </div>
+                    </div>
+
+                    <div class="dash-subjects">
+                        <h3>📘 આ સેમેસ્ટરના વિષયો</h3>
+                        <ul id="dash-subject-list"></ul>
+                    </div>
+                </section>
+
+                <!-- ===== DOUBT ===== -->
+                <section id="doubt-section" class="tab-content" style="display:none;">
+                    <h2>AI Doubt & Code Solver</h2>
+                    <div id="chat-box"></div>
+                    <div class="input-row">
+                        <textarea id="user-query" placeholder="તમારો સવાલ અથવા કોડની એરર અહીં લખો..." rows="4"></textarea>
+                        <button id="mic-btn" onclick="toggleVoiceInput()" title="બોલીને લખો" class="mic-button">🎤</button>
+                    </div>
+                    <button onclick="askAI()">પૂછો</button>
+                </section>
+
+                <!-- ===== LIBRARY ===== -->
+                <section id="library-section" class="tab-content" style="display:none;">
+                    <h2>Automatic Online Library</h2>
+                    <p>ટોપિક લખો — AI સમજૂતી + બુક્સ + રિયલ મટીરીયલ લિંક્સ આપશે.</p>
+                    <input type="text" id="book-topic" placeholder="દા.ત. Python Loops Basics">
+                    <button onclick="searchBooks()">મટીરીયલ શોધો</button>
+                    <div id="library-results"></div>
+                    <div id="library-links"></div>
+                </section>
+
+                <!-- ===== SYLLABUS ===== -->
+                <section id="syllabus-section" class="tab-content" style="display:none;">
+                    <h2>Syllabus Tracker</h2>
+                    <p>વિષય પસંદ કરો, ટોપિક ઉમેરો. પૂરું થાય એટલે ✓ કરો.</p>
+                    <div class="syllabus-form">
+                        <select id="syllabus-subject"></select>
+                        <input type="text" id="syllabus-topic" placeholder="દા.ત. Loops & Iteration">
+                        <button onclick="addSyllabusTopic()">ટોપિક ઉમેરો</button>
+                    </div>
+                    <div id="syllabus-progress-wrap">
+                        <div class="progress-track"><div id="syllabus-progress-bar" class="progress-fill"></div></div>
+                        <span id="syllabus-progress-label">0% પૂરું</span>
+                    </div>
+                    <div id="syllabus-groups"></div>
+                </section>
+
+                <!-- ===== FLASHCARDS ===== -->
+                <section id="flashcard-section" class="tab-content" style="display:none;">
+                    <h2>Flashcards</h2>
+                    <div class="flash-generate-row">
+                        <input type="text" id="flash-ai-topic" placeholder="દા.ત. OOP Concepts in Java">
+                        <button onclick="generateFlashcards()">AI થી કાર્ડ બનાવો</button>
+                    </div>
+                    <details class="manual-add">
+                        <summary>જાતે કાર્ડ ઉમેરો</summary>
+                        <div class="flash-manual-row">
+                            <input type="text" id="flash-front" placeholder="સવાલ / શબ્દ (આગળ)">
+                            <input type="text" id="flash-back" placeholder="જવાબ / સમજૂતી (પાછળ)">
+                            <button onclick="addFlashcardManual()">ઉમેરો</button>
+                        </div>
+                    </details>
+                    <div id="flashcard-stage">
+                        <div id="flashcard-counter">0 / 0</div>
+                        <div id="flashcard" class="flashcard" onclick="flipFlashcard()">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-face flashcard-front">કાર્ડ ઉમેરો અથવા AI થી બનાવો</div>
+                                <div class="flashcard-face flashcard-back"></div>
+                            </div>
+                        </div>
+                        <div class="flashcard-nav">
+                            <button onclick="prevFlashcard()">⟵ પાછળ</button>
+                            <button onclick="shuffleFlashcards()">🔀 શફલ</button>
+                            <button onclick="nextFlashcard()">આગળ ⟶</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== MY PROJECTS ===== -->
+                <section id="projects-section" class="tab-content" style="display:none;">
+                    <h2>📂 My Projects & GitHub</h2>
+                    <p>તમારા પ્રોજેક્ટની GitHub લિંક સેવ કરો. AI પ્રોફેશનલ README બનાવી આપશે.</p>
+                    <div class="project-form">
+                        <input type="text" id="proj-name" placeholder="પ્રોજેક્ટ નામ (દા.ત. Student Manager)">
+                        <input type="text" id="proj-link" placeholder="GitHub Link (https://github.com/...)">
+                        <textarea id="proj-desc" rows="2" placeholder="ટૂંકું ડિસ્ક્રિપ્શન..."></textarea>
+                        <button onclick="addProject()">પ્રોજેક્ટ સેવ કરો</button>
+                    </div>
+                    <div id="projects-list"></div>
+                    <div id="readme-output"></div>
+                </section>
+
+                <!-- ===== DSA CORNER ===== -->
+                <section id="dsa-section" class="tab-content" style="display:none;">
+                    <h2>💡 DSA Corner</h2>
+                    <p>ડેટા સ્ટ્રક્ચર્સ અને અલ્ગોરિધમ્સ — શોર્ટ નોટ્સ + AI દેશી ઉદાહરણ.</p>
+                    <div class="dsa-chips">
+                        <button onclick="explainDSA('Stack')">📚 Stack</button>
+                        <button onclick="explainDSA('Queue')">🚶 Queue</button>
+                        <button onclick="explainDSA('Linked List')">🔗 Linked List</button>
+                        <button onclick="explainDSA('Bubble Sort')">🫧 Bubble Sort</button>
+                        <button onclick="explainDSA('Binary Search')">🔍 Binary Search</button>
+                        <button onclick="explainDSA('Recursion')">🌀 Recursion</button>
+                    </div>
+                    <div class="dsa-custom">
+                        <input type="text" id="dsa-topic" placeholder="બીજું કોઈ ટોપિક... દા.ત. Merge Sort">
+                        <button onclick="explainDSACustom()">સમજાવો</button>
+                    </div>
+                    <div id="dsa-output"></div>
+                </section>
+
+                <!-- ===== GROWTH TRACKER ===== -->
+                <section id="result-section" class="tab-content" style="display:none;">
+                    <h2>Growth Tracker (માર્ક્સ એન્ટ્રી)</h2>
+                    <div class="marks-form">
+                        <select id="subject-select"></select>
+                        <input type="number" id="subject-marks" placeholder="માર્ક્સ (0-100)">
+                        <button onclick="addMarks()">સેવ કરો</button>
+                    </div>
+                    <h3>તમારો ગ્રોથ રિપોર્ટ:</h3>
+                    <div id="growth-status"></div>
+                    <ul id="marks-list"></ul>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer id="save-indicator"></footer>
+
+    <script type="importmap">
+      { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
+    </script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
