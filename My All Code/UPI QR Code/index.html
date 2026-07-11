@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Dynamic QR Generator</title>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .main-wrapper {
+            max-width: 450px;
+            width: 100%;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 { color: #222; margin-top: 0; margin-bottom: 20px; font-size: 22px; }
+        input[type="number"] {
+            width: 85%;
+            padding: 14px;
+            font-size: 18px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+            transition: 0.2s;
+        }
+        input[type="number"]:focus { border-color: #4CAF50; }
+        .btn-group {
+            display: flex;
+            justify-content: space-around;
+            gap: 12px;
+            width: 90%;
+            margin: 0 auto 20px auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #45a049; }
+        .share-btn { background-color: #007bff; }
+        .share-btn:hover { background-color: #0069d9; }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        #cardDisplay {
+            display: none; /* શરૂઆતમાં છુપાડેલું */
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .card-segment {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        #qr-container {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px; /* QR ની આસપાસ થોડી જગ્યા */
+            position: relative;
+        }
+        #gpay-logo {
+            position: absolute;
+            width: 18%; /* લોગોની સાઈઝ */
+            height: auto;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #dadce0;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="container">
+        <h2>UPI રકમ QR કોડ જનરેટર</h2>
+        <form onsubmit="return false;">
+            <input type="number" id="amount" placeholder="રકમ (₹) દાખલ કરો" step="any" required min="1" autofocus>
+            <br>
+            <div class="btn-group">
+                <button id="createBtn" onclick="buildDynamicCard();">કાર્ડ બનાવો</button>
+                <button type="button" class="share-btn" id="shareBtn" onclick="shareCard();" disabled>સીધું શેર કરો</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- તમારું પેમેન્ટ કાર્ડ અહીંયા દેખાશે -->
+    <div id="cardDisplay">
+        <!-- ૧. ટોચનો ભાગ (તમારું નામ અને પ્રોફાઈલ) -->
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYFBgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCAOfAcsDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqcc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqcc3R1dnd4eXqFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECzAEEEQUSITFBBhNRYQcicRQygZGhscEJXxUX0VwM4WNYbyvi84RFRgcICQoJChYWG9kdYGRlghoomKqpys1ekccg69wdF4eXl6ipKS015vXN5ecXEY56v3dH19fZ3uHi469gp6v8Q3o6v8xCfm5+fX29/j5+v/aAW9wdecade:gu" class="card-segment" alt="Card Top">
+        
+        <!-- ૨. વચ્ચે નવો dynamic QR કોડ -->
+        <div id="qr-container">
+            <div id="new-dynamic-qr"></div>
+            <!-- Google Pay લોગો -->
+            <img id="gpay-logo" src="https://upload.wikimedia.org/wikipedia/commons/7/71/Google_Pay_%28GPay%29_Logo_2020.svg" alt="GPay">
+        </div>
+
+        <!-- ૩. નીચેનો ભાગ (તમારો UPI ID) -->
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYFBgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCAAiAcIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqcc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqcc3R1dnd4eXqFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECzAEEEQUSITFBBhNRYQcicRQygZGhscEJXxUX0VwM4WNYbyvi84RFRgcICQoJChYWG9kdYGRlghoomKqpys1ekccg69wdF4eXl6ipKS015vXN5ecXEY56v3dH19fZ3uHi469gp6v8Q3o6v8xCfm5+fX29/j5+v/aAW9wdecade:gu" class="card-segment" alt="Card Bottom">
+    </div>
+</div>
+
+<div style="display:none">
+    <canvas id="tempCanvas"></canvas>
+</div>
+
+<script>
+const upiId = "shelanaalpesh950-1@okicici"; 
+const name = "Alpesh Shelana";
+
+function buildDynamicCard() {
+    const amountInput = document.getElementById("amount");
+    const amount = amountInput.value;
+    const qrDiv = document.getElementById("new-dynamic-qr");
+    const displayCard = document.getElementById("cardDisplay");
+    const shareBtn = document.getElementById("shareBtn");
+
+    if (!amount || amount <= 0) {
+        alert("કૃપા કરીને સાચી રકમ દાખલ કરો.");
+        return;
+    }
+
+    qrDiv.innerHTML = ""; // જૂનો QR સાફ કરો
+    shareBtn.disabled = true;
+
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+    
+    // નવો QR કોડ જનરેટ કરવો
+    new QRCode(qrDiv, {
+        text: upiUrl,
+        width: 250, // તમારા કાર્ડમાં બરાબર ફિટ થાય એટલે સાઈઝ ૨૫૦ રાખી છે
+        height: 250,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    // તમારું આખું સ્પ્લિટ કાર્ડ બતાવો
+    displayCard.style.display = "block";
+    shareBtn.disabled = false;
+    
+    // થોડું સ્ક્રોલ કરો જેથી કાર્ડ દેખાય
+    window.scrollBy({ top: 150, behavior: 'smooth' });
+}
+
+async function shareCard() {
+    // આખા કાર્ડને કેનવાસ પર કન્વર્ટ કરવું શેરિંગ માટે
+    const canvas = document.getElementById("tempCanvas");
+    const ctx = canvas.getContext("2d");
+    const displayCard = document.getElementById("cardDisplay");
+    const amount = document.getElementById("amount").value;
+
+    const createBtn = document.getElementById("createBtn");
+    createBtn.disabled = true;
+    createBtn.innerText = "પ્રોસેસિંગ...";
+
+    const shareBtn = document.getElementById("shareBtn");
+    shareBtn.disabled = true;
+
+    try {
+        const segments = displayCard.querySelectorAll(".card-segment");
+        const qrImg = document.querySelector("#new-dynamic-qr img");
+        const gpayLogo = document.getElementById("gpay-logo");
+
+        // કેનવાસનું કદ સેટ કરવું
+        const totalHeight = 2 *Segments[0].naturalHeight + 270; // ૨ સેગમેન્ટ + QR કન્ટેનર
+        canvas.width = Segments[0].naturalWidth;
+        canvas.height = totalHeight;
+
+        // ૧. બેકગ્રાઉન્ડ કોડ દ્વારા જ રજૂ કરીશું
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // ૨. ટોચનો ભાગ દોરો
+        ctx.drawImage(Segments[0], 0, 0);
+
+        // ૩. QR કોડ દોરો (વચ્ચે)
+        const qrSize = 250;
+        const xPos = (canvas.width - qrSize) / 2;
+        const yPos = Segments[0].naturalHeight + 10;
+        ctx.drawImage(qrImg, xPos, yPos, qrSize, qrSize);
+
+        // ૪. Google Pay લોગો દોરો
+        const logoSize = qrSize * 0.18;
+        const logoX = xPos + (qrSize - logoSize) / 2;
+        const logoY = yPos + (qrSize - logoSize) / 2;
+        
+        ctx.beginPath();
+        ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize/2 + 6, 0, 2 * Math.PI);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#dadce0";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        
+        ctx.drawImage(gpayLogo, logoX, logoY, logoSize, logoSize);
+
+        // ૫. નીચેનો ભાગ દોરો
+        ctx.drawImage(Segments[1], 0, yPos + qrSize + 10);
+
+        // ૬. કેનવાસને શેર કરો
+        const dataUrl = canvas.toDataURL("image/png");
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `UPI_Payment_₹${amount}.png`, { type: 'image/png' });
+        
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: 'UPI Payment',
+                text: `અલ્પેશ શેલાનાને ₹${amount} મોકલવા માટે આ QR કોડ સ્કેન કરો.`
+            });
+        } else {
+            alert("તમારું બ્રાઉઝર સીધું શેરિંગ સપોર્ટ નથી કરતું. આ જુગાડ કામ નહીં કરે.");
+        }
+    } catch (error) {
+        console.log('શેરિંગમાં સમસ્યા: ', error);
+        alert("શેર કરવામાં કોઈ એરર આવી.");
+    } finally {
+        createBtn.disabled = false;
+        createBtn.innerText = "કાર્ડ બનાવો";
+        shareBtn.disabled = false;
+    }
+}
+</script>
+
+</body>
+</html>
